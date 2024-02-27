@@ -1,30 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { UserApi } from "../api/user";
+import { api } from "../api/api";
 
 const userSlice = createSlice({
-  name: "userSlice",
-  initialState: {
-    users: [],
-    user: null,
-  },
-  reducers: {
-    setUsers: (state, action) => {
-      state.users = action.payload;
-    },
-    setUser: (state, action) => {
-      state.user = action.payload;
-    },
-  },
+  name: "user",
+  initialState: [],
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addMatcher(
-        UserApi.endpoints.getUsers.matchFulfilled,
+        api.endpoints.getUsers.matchFulfilled,
         (state, { payload }) => {
           state.users = payload;
         }
       )
       .addMatcher(
-        UserApi.endpoints.getUserById.matchFulfilled,
+        api.endpoints.getUserById.matchFulfilled,
         (state, { payload }) => {
           state.user = payload;
         }
@@ -33,4 +23,3 @@ const userSlice = createSlice({
 });
 
 export default userSlice.reducer;
-export const { setUsers, setUser } = userSlice.actions;

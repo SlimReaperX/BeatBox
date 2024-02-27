@@ -1,19 +1,19 @@
-import {useEffect} from "react";
-import {Route, Routes} from "react-router-dom";
-import "./index.css"
-
+import { Route, Routes } from "react-router-dom";
+import "./index.css";
+import Users from "./components/users/Users";
+import Nav from "./components/navigation/Nav";
+import Home from "./components/home/Home";
 
 function App() {
-
-
   return (
-  
     <div>
+      <Nav />
       <Routes>
-          <Route path ={"/users"} element={<User/>}/>
+        <Route path={"/"} element={<Home />} />
+        <Route path={"/users"} element={<Users />} />
       </Routes>
-      </div>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;

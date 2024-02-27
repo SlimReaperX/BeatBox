@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const JWT = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 router.post("/register", async (req, res, next) => {
@@ -44,7 +44,7 @@ router.post("/login", async (req, res, next) => {
     if (!passwordMatch) {
       return res.status(401).send({ message: "Invalid login credentials" });
     }
-    const token = JWT.sign({ id: user.id }, process.env.JWT_SECRET);
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
     return res.status(200).send({ token, message: "Successfully logged in!" });
   } catch (error) {
     next(error);
