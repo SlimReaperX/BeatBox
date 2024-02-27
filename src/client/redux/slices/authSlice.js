@@ -1,51 +1,48 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { authApi } from "../api/auth";
+import { api } from "../api/api";
+
+const CREDENTIALS = "credentials";
+
+function storeToken(state, { payload }) {
+  state.credentials = { token: payload.token, user: { ...payload.user } };
+  window.sessionStorage.setItem(
+    CREDENTIALS,
+    JSON.stringify({
+      token: payload.token,
+      user: { ...payload.user },
+    })
+  );
+}
 
 const authSlice = createSlice({
-  name: "authSlice",
+  name: "auth",
   initialState: {
-    user: null,
-    token: null,
-  },
-  reducers: {
-    setUser: (state, action) => {
-      state.user = action.payload;
-    },
-    setToken: (state, action) => {
-      state.token = action.payload;
+    credentials: JSON.parse(window.sessionStorage.getItem(CREDENTIALS)) || {
+      token: "",
+      user: { userId: null, admin: false },
     },
   },
+  reducers: {},
   extraReducers: (builder) => {
-    builder
-      .addMatcher(
-        authApi.endpoints.login.matchFulfilled,
-        (state, { payload }) => {
-          state.user = payload.user;
-          state.token = payload.token;
-        }
-      )
-      .addMatcher(
-        authApi.endpoints.register.matchFulfilled,
-        (state, { payload }) => {
-          state.user = payload.user;
-          state.token = payload.token;
-        }
-      )
-      .addMatcher(
-        authApi.endpoints.edit.matchFulfilled,
-        (state, { payload }) => {
-          state.user = payload.user;
-        }
-      )
-      .addMatcher(
-        authApi.endpoints.logout.matchFulfilled,
-        (state) => {
-          state.user = null;
-          state.token = null;
-        }
-      );
+    builder.addMatcher(api.endpoints.login.matchFulfilled, storeToken);
+    builder.addMatcher(api.endpoints.register.matchFulfilled, storeToken);
+    builder.addMatcher(
+      api.endpoints.edit.matchFulfilled,
+      (state, { payload }) => {
+        state.credentials = {
+          ...state.credentials,
+          user: payload,
+        };
+      }
+    );
+    builder.addMatcher(api.endpoints.logout.matchFulfilled, (state) => {
+      state.credentials = {
+        token: "",
+        user: { userId: null, admin: false },
+      };
+      window.sessionStorage.removeItem(CREDENTIALS);
+    });
   },
 });
 
 export default authSlice.reducer;
-export const { setUser, setToken } = authSlice.actions;
